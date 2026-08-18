@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ball: #d8f34a;
+  --color-ball-dark: #b9d92c;
+  --color-court: #14503d;
+  --color-court-light: #1f7a5c;
+  --color-clay: #f4f7ee;
+  /* โทนดำเข้ม: พื้นหลัง → การ์ด → ชั้นยก → เส้นขอบ */
+  --color-ink: #0a0d0c;
+  --color-panel: #141917;
+  --color-panel-2: #1e2422;
+  --color-line: #2c3431;
+}
+
+/* ต้องเป็น inline เพราะค่าอ้าง CSS variable ที่ next/font ใส่ให้ตอน runtime บน <html> */
+@theme inline {
+  --font-sans: var(--font-noto-sans-thai), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ลายเส้นคอร์ทจาง ๆ บน header — ทำด้วย gradient ไม่ใช้รูป */
+.court-lines {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.14) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(255,255,255,.10) 2px, transparent 2px);
+  background-size: 120px 100%, 100% 64px;
+}
+
+/* แสดง error หลังผู้ใช้โต้ตอบเสร็จแล้วเท่านั้น (ไม่ขึ้นตอนกำลังพิมพ์ครั้งแรก) */
+.field:user-invalid { border-color: #f87171; background-color: #2b1618; }
+.field:user-invalid ~ .err { display: block; }
+.err { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
