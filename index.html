@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
 <title>กรีนสแมช เทนนิส — จองคิวสนาม</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +16,11 @@
     --color-court: #14503d;
     --color-court-light: #1f7a5c;
     --color-clay: #f4f7ee;
+    /* โทนดำเข้ม: พื้นหลัง → การ์ด → ชั้นยก → เส้นขอบ */
+    --color-ink: #0a0d0c;
+    --color-panel: #141917;
+    --color-panel-2: #1e2422;
+    --color-line: #2c3431;
     --font-sans: 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
   }
 
@@ -27,7 +33,7 @@
   }
 
   /* แสดง error หลังผู้ใช้โต้ตอบเสร็จแล้วเท่านั้น (ไม่ขึ้นตอนกำลังพิมพ์ครั้งแรก) */
-  .field:user-invalid { border-color: #dc2626; background-color: #fef2f2; }
+  .field:user-invalid { border-color: #f87171; background-color: #2b1618; }
   .field:user-invalid ~ .err { display: block; }
   .err { display: none; }
 
@@ -36,7 +42,7 @@
   }
 </style>
 </head>
-<body class="bg-clay text-slate-800 font-sans min-h-screen">
+<body class="bg-ink text-slate-100 font-sans min-h-screen">
 
 <header class="bg-court court-lines text-white">
   <div class="mx-auto max-w-3xl px-4 py-7">
@@ -51,7 +57,7 @@
 </header>
 
 <!-- แถบขั้นตอน -->
-<nav aria-label="ขั้นตอนการจอง" class="sticky top-0 z-10 border-b border-black/5 bg-clay/90 backdrop-blur">
+<nav aria-label="ขั้นตอนการจอง" class="sticky top-0 z-10 border-b border-white/10 bg-ink/90 backdrop-blur">
   <ol id="stepper" class="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3 text-sm"></ol>
 </nav>
 
@@ -66,8 +72,8 @@
     <div id="courts" class="grid gap-3 md:grid-cols-3"></div>
 
     <h2 class="mt-7 mb-1 text-lg font-bold">3. เลือกช่วงเวลา</h2>
-    <p class="mb-3 text-sm text-slate-500">เลือกได้หลายช่อง ช่องละ 1 ชั่วโมง</p>
-    <div id="slot-hint" class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+    <p class="mb-3 text-sm text-slate-400">เลือกได้หลายช่อง ช่องละ 1 ชั่วโมง</p>
+    <div id="slot-hint" class="rounded-xl border border-dashed border-line p-6 text-center text-sm text-slate-400">
       เลือกวันที่และคอร์ทก่อน เพื่อดูช่วงเวลาที่ว่าง
     </div>
     <div id="slots" class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"></div>
@@ -76,30 +82,30 @@
   <!-- ══════════ ขั้นที่ 2: ข้อมูลผู้จอง ══════════ -->
   <section id="step-2" data-step="2" hidden>
     <h2 class="mb-1 text-lg font-bold">ข้อมูลผู้จอง</h2>
-    <p class="mb-5 text-sm text-slate-500">กรอกให้ครบเพื่อยืนยันคิว เราจะติดต่อกลับหากมีการเปลี่ยนแปลง</p>
+    <p class="mb-5 text-sm text-slate-400">กรอกให้ครบเพื่อยืนยันคิว เราจะติดต่อกลับหากมีการเปลี่ยนแปลง</p>
 
-    <form id="booker-form" class="space-y-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5" novalidate>
+    <form id="booker-form" class="space-y-5 rounded-2xl bg-panel p-5 shadow-sm ring-1 ring-white/10" novalidate>
       <div>
-        <label for="name" class="mb-1.5 block text-sm font-medium">ชื่อ-นามสกุล <span class="text-red-600">*</span></label>
+        <label for="name" class="mb-1.5 block text-sm font-medium">ชื่อ-นามสกุล <span class="text-red-400">*</span></label>
         <input id="name" name="name" type="text" required minlength="2" autocomplete="name"
                aria-describedby="name-err" placeholder="เช่น สมชาย ใจดี"
-               class="field w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball">
-        <p id="name-err" class="err mt-1.5 text-sm text-red-600">กรุณากรอกชื่อ-นามสกุล อย่างน้อย 2 ตัวอักษร</p>
+               class="field w-full rounded-xl border border-line bg-panel-2 px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball">
+        <p id="name-err" class="err mt-1.5 text-sm text-red-400">กรุณากรอกชื่อ-นามสกุล อย่างน้อย 2 ตัวอักษร</p>
       </div>
 
       <div>
-        <label for="phone" class="mb-1.5 block text-sm font-medium">เบอร์โทรศัพท์ <span class="text-red-600">*</span></label>
+        <label for="phone" class="mb-1.5 block text-sm font-medium">เบอร์โทรศัพท์ <span class="text-red-400">*</span></label>
         <input id="phone" name="phone" type="tel" required pattern="0[0-9]{9}" inputmode="numeric" maxlength="10"
                autocomplete="tel" aria-describedby="phone-err" placeholder="0812345678"
                title="เบอร์โทรศัพท์ 10 หลัก ขึ้นต้นด้วย 0"
-               class="field w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball">
-        <p id="phone-err" class="err mt-1.5 text-sm text-red-600">กรุณากรอกเบอร์โทร 10 หลัก ขึ้นต้นด้วย 0 (เช่น 0812345678)</p>
+               class="field w-full rounded-xl border border-line bg-panel-2 px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball">
+        <p id="phone-err" class="err mt-1.5 text-sm text-red-400">กรุณากรอกเบอร์โทร 10 หลัก ขึ้นต้นด้วย 0 (เช่น 0812345678)</p>
       </div>
 
       <div>
-        <label for="note" class="mb-1.5 block text-sm font-medium">หมายเหตุ <span class="text-slate-400">(ไม่บังคับ)</span></label>
+        <label for="note" class="mb-1.5 block text-sm font-medium">หมายเหตุ <span class="text-slate-500">(ไม่บังคับ)</span></label>
         <textarea id="note" name="note" rows="3" maxlength="200" placeholder="เช่น ขอยืมไม้แร็กเกต 2 อัน"
-                  class="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball"></textarea>
+                  class="w-full resize-none rounded-xl border border-line bg-panel-2 px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball"></textarea>
       </div>
     </form>
   </section>
@@ -107,10 +113,10 @@
   <!-- ══════════ ขั้นที่ 3: ยืนยันการจอง ══════════ -->
   <section id="step-3" data-step="3" hidden>
     <h2 class="mb-1 text-lg font-bold">ตรวจสอบและยืนยัน</h2>
-    <p class="mb-5 text-sm text-slate-500">โปรดตรวจสอบรายละเอียดก่อนกดยืนยัน</p>
+    <p class="mb-5 text-sm text-slate-400">โปรดตรวจสอบรายละเอียดก่อนกดยืนยัน</p>
 
-    <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
-      <dl id="summary" class="divide-y divide-slate-100"></dl>
+    <div class="overflow-hidden rounded-2xl bg-panel shadow-sm ring-1 ring-white/10">
+      <dl id="summary" class="divide-y divide-white/10"></dl>
       <div class="flex items-end justify-between gap-4 bg-court px-5 py-4 text-white">
         <div>
           <p class="text-sm text-white/70">รวมทั้งสิ้น</p>
@@ -123,15 +129,15 @@
 </main>
 
 <!-- แถบสรุป + ปุ่มนำทาง (ติดล่างจอ) -->
-<div class="fixed inset-x-0 bottom-0 border-t border-black/5 bg-white/95 backdrop-blur">
+<div class="fixed inset-x-0 bottom-0 border-t border-white/10 bg-ink/95 backdrop-blur">
   <div class="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-    <p id="bar-info" class="min-w-0 flex-1 text-sm text-slate-600"></p>
+    <p id="bar-info" class="min-w-0 flex-1 text-sm text-slate-400"></p>
     <button id="btn-back" type="button"
-            class="rounded-xl px-4 py-3 font-medium text-slate-600 transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-court">
+            class="rounded-xl px-4 py-3 font-medium text-slate-300 transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-ball">
       ย้อนกลับ
     </button>
     <button id="btn-next" type="button"
-            class="rounded-xl bg-ball px-6 py-3 font-bold text-court shadow-sm transition hover:bg-ball-dark focus-visible:ring-2 focus-visible:ring-court focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none">
+            class="rounded-xl bg-ball px-6 py-3 font-bold text-court shadow-sm transition hover:bg-ball-dark focus-visible:ring-2 focus-visible:ring-ball focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:bg-panel-2 disabled:text-slate-500 disabled:shadow-none">
       ถัดไป
     </button>
   </div>
@@ -139,14 +145,14 @@
 
 <!-- ป๊อปอัพยืนยันสำเร็จ -->
 <dialog id="done" closedby="any"
-        class="m-auto w-[min(24rem,90vw)] rounded-2xl p-0 backdrop:bg-black/50">
+        class="m-auto w-[min(24rem,90vw)] rounded-2xl bg-panel p-0 text-slate-100 ring-1 ring-white/10 backdrop:bg-black/70">
   <div class="p-7 text-center">
     <div class="mx-auto grid size-16 place-items-center rounded-full bg-ball text-3xl">✓</div>
     <h2 class="mt-4 text-xl font-bold">จองสำเร็จแล้ว!</h2>
-    <p class="mt-1 text-sm text-slate-500">เจ้าหน้าที่จะโทรยืนยันก่อนถึงเวลาจอง</p>
-    <p class="mt-4 text-sm text-slate-500">เลขที่การจอง</p>
-    <p id="ref" class="text-2xl font-bold tracking-wider text-court"></p>
-    <p id="done-detail" class="mt-3 text-sm text-slate-600"></p>
+    <p class="mt-1 text-sm text-slate-400">เจ้าหน้าที่จะโทรยืนยันก่อนถึงเวลาจอง</p>
+    <p class="mt-4 text-sm text-slate-400">เลขที่การจอง</p>
+    <p id="ref" class="text-2xl font-bold tracking-wider text-ball"></p>
+    <p id="done-detail" class="mt-3 text-sm text-slate-400"></p>
     <button id="btn-again" type="button" autofocus
             class="mt-6 w-full rounded-xl bg-court px-4 py-3 font-bold text-white transition hover:bg-court-light focus-visible:ring-2 focus-visible:ring-ball">
       จองอีกครั้ง
@@ -232,12 +238,12 @@ STEP_LABELS.forEach((label, i) => {
   li.innerHTML = `
     <span data-circle class="grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition">${i + 1}</span>
     <span data-label class="truncate transition">${label}</span>
-    ${i < STEP_LABELS.length - 1 ? '<span class="hidden h-px flex-1 bg-slate-300 sm:block"></span>' : ''}`
+    ${i < STEP_LABELS.length - 1 ? '<span class="hidden h-px flex-1 bg-line sm:block"></span>' : ''}`
   stepperEl.append(li)
 })
 
 DAYS.forEach((day) => {
-  const btn = el('button', 'shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-court')
+  const btn = el('button', 'shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-ball')
   btn.type = 'button'
   btn.dataset.date = day.key
   btn.innerHTML = `
@@ -248,19 +254,19 @@ DAYS.forEach((day) => {
 })
 
 COURTS.forEach((court) => {
-  const btn = el('button', 'rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-court')
+  const btn = el('button', 'rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-ball')
   btn.type = 'button'
   btn.dataset.court = court.id
   btn.innerHTML = `
     <span class="block font-bold">${court.name}</span>
-    <span class="block text-sm text-slate-500">${court.surface}</span>
-    <span data-price class="mt-2 block font-bold">${baht(court.price)}<span class="text-sm font-normal text-slate-500"> / ชม.</span></span>`
+    <span class="block text-sm text-slate-400">${court.surface}</span>
+    <span data-price class="mt-2 block font-bold">${baht(court.price)}<span class="text-sm font-normal text-slate-400"> / ชม.</span></span>`
   btn.addEventListener('click', () => setState({ court: court.id, hours: [] }))
   courtsEl.append(btn)
 })
 
 HOURS.forEach((hour) => {
-  const btn = el('button', 'rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-court')
+  const btn = el('button', 'rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-ball')
   btn.type = 'button'
   btn.dataset.hour = hour
   btn.addEventListener('click', () => {
@@ -280,9 +286,9 @@ function render() {
     li.setAttribute('aria-current', active ? 'step' : 'false')
     li.querySelector('[data-circle]').className =
       `grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition ${
-        active ? 'bg-court text-white' : past ? 'bg-ball text-court' : 'bg-slate-200 text-slate-500'}`
+        active ? 'bg-ball text-court' : past ? 'bg-court-light text-white' : 'bg-panel-2 text-slate-500'}`
     li.querySelector('[data-label]').className =
-      `truncate transition ${active ? 'font-bold text-court' : 'text-slate-400'}`
+      `truncate transition ${active ? 'font-bold text-ball' : 'text-slate-500'}`
   })
 
   // สลับหน้าจอ
@@ -294,17 +300,17 @@ function render() {
   daysEl.querySelectorAll('button').forEach((btn) => {
     const on = btn.dataset.date === state.date
     btn.setAttribute('aria-pressed', String(on))
-    btn.className = `shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-court ${
-      on ? 'border-court bg-court text-white' : 'border-slate-200 bg-white hover:border-court'}`
+    btn.className = `shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-ball ${
+      on ? 'border-ball bg-court text-white' : 'border-line bg-panel hover:border-ball/60'}`
   })
 
   // การ์ดคอร์ท
   courtsEl.querySelectorAll('button').forEach((btn) => {
     const on = btn.dataset.court === state.court
     btn.setAttribute('aria-pressed', String(on))
-    btn.className = `rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-court ${
-      on ? 'border-court bg-court/5 ring-2 ring-court' : 'border-slate-200 bg-white hover:border-court'}`
-    btn.querySelector('[data-price]').classList.toggle('text-court', on)
+    btn.className = `rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-ball ${
+      on ? 'border-ball bg-ball/10 ring-2 ring-ball' : 'border-line bg-panel hover:border-ball/60'}`
+    btn.querySelector('[data-price]').classList.toggle('text-ball', on)
   })
 
   // ช่วงเวลา
@@ -321,10 +327,10 @@ function render() {
     btn.innerHTML = isTaken
       ? `<span class="line-through">${hhmm(hour)}</span><span class="block text-xs">เต็ม</span>`
       : hhmm(hour)
-    btn.className = `rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-court ${
-      isTaken ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+    btn.className = `rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-ball ${
+      isTaken ? 'cursor-not-allowed border-line/60 bg-panel-2 text-slate-600'
       : on ? 'border-ball-dark bg-ball font-bold text-court'
-      : 'border-slate-200 bg-white hover:border-court'}`
+      : 'border-line bg-panel hover:border-ball/60'}`
   })
 
   if (state.step === 3) renderSummary()
@@ -346,7 +352,7 @@ function renderSummary() {
   ]
   document.getElementById('summary').innerHTML = rows.map(([label, value]) => `
     <div class="flex gap-4 px-5 py-3">
-      <dt class="w-24 shrink-0 text-sm text-slate-500">${label}</dt>
+      <dt class="w-24 shrink-0 text-sm text-slate-400">${label}</dt>
       <dd class="flex-1 font-medium">${esc(value)}</dd>
     </div>`).join('')
 
