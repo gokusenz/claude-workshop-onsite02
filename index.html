@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>กรีนสแมช เทนนิส — จองคิวสนาม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --color-ball: #d8f34a;
+    --color-ball-dark: #b9d92c;
+    --color-court: #14503d;
+    --color-court-light: #1f7a5c;
+    --color-clay: #f4f7ee;
+    --font-sans: 'Noto Sans Thai', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* ลายเส้นคอร์ทจาง ๆ บน header — ทำด้วย gradient ไม่ใช้รูป */
+  .court-lines {
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,.14) 2px, transparent 2px),
+      linear-gradient(to bottom, rgba(255,255,255,.10) 2px, transparent 2px);
+    background-size: 120px 100%, 100% 64px;
+  }
+
+  /* แสดง error หลังผู้ใช้โต้ตอบเสร็จแล้วเท่านั้น (ไม่ขึ้นตอนกำลังพิมพ์ครั้งแรก) */
+  .field:user-invalid { border-color: #dc2626; background-color: #fef2f2; }
+  .field:user-invalid ~ .err { display: block; }
+  .err { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body class="bg-clay text-slate-800 font-sans min-h-screen">
+
+<header class="bg-court court-lines text-white">
+  <div class="mx-auto max-w-3xl px-4 py-7">
+    <div class="flex items-center gap-3">
+      <span class="grid size-11 place-items-center rounded-full bg-ball text-court text-xl font-bold shadow-lg shadow-black/20">🎾</span>
+      <div>
+        <h1 class="text-xl font-bold leading-tight sm:text-2xl">กรีนสแมช เทนนิส คลับ</h1>
+        <p class="text-sm text-white/70">จองคิวออนไลน์ · เปิดทุกวัน 09:00 – 21:00 น.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- แถบขั้นตอน -->
+<nav aria-label="ขั้นตอนการจอง" class="sticky top-0 z-10 border-b border-black/5 bg-clay/90 backdrop-blur">
+  <ol id="stepper" class="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3 text-sm"></ol>
+</nav>
+
+<main class="mx-auto max-w-3xl px-4 pb-32 pt-6">
+
+  <!-- ══════════ ขั้นที่ 1: เลือกวัน-เวลา ══════════ -->
+  <section id="step-1" data-step="1">
+    <h2 class="mb-3 text-lg font-bold">1. เลือกวันที่</h2>
+    <div id="days" class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2"></div>
+
+    <h2 class="mt-7 mb-3 text-lg font-bold">2. เลือกคอร์ท</h2>
+    <div id="courts" class="grid gap-3 md:grid-cols-3"></div>
+
+    <h2 class="mt-7 mb-1 text-lg font-bold">3. เลือกช่วงเวลา</h2>
+    <p class="mb-3 text-sm text-slate-500">เลือกได้หลายช่อง ช่องละ 1 ชั่วโมง</p>
+    <div id="slot-hint" class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+      เลือกวันที่และคอร์ทก่อน เพื่อดูช่วงเวลาที่ว่าง
+    </div>
+    <div id="slots" class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"></div>
+  </section>
+
+  <!-- ══════════ ขั้นที่ 2: ข้อมูลผู้จอง ══════════ -->
+  <section id="step-2" data-step="2" hidden>
+    <h2 class="mb-1 text-lg font-bold">ข้อมูลผู้จอง</h2>
+    <p class="mb-5 text-sm text-slate-500">กรอกให้ครบเพื่อยืนยันคิว เราจะติดต่อกลับหากมีการเปลี่ยนแปลง</p>
+
+    <form id="booker-form" class="space-y-5 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5" novalidate>
+      <div>
+        <label for="name" class="mb-1.5 block text-sm font-medium">ชื่อ-นามสกุล <span class="text-red-600">*</span></label>
+        <input id="name" name="name" type="text" required minlength="2" autocomplete="name"
+               aria-describedby="name-err" placeholder="เช่น สมชาย ใจดี"
+               class="field w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball">
+        <p id="name-err" class="err mt-1.5 text-sm text-red-600">กรุณากรอกชื่อ-นามสกุล อย่างน้อย 2 ตัวอักษร</p>
+      </div>
+
+      <div>
+        <label for="phone" class="mb-1.5 block text-sm font-medium">เบอร์โทรศัพท์ <span class="text-red-600">*</span></label>
+        <input id="phone" name="phone" type="tel" required pattern="0[0-9]{9}" inputmode="numeric" maxlength="10"
+               autocomplete="tel" aria-describedby="phone-err" placeholder="0812345678"
+               title="เบอร์โทรศัพท์ 10 หลัก ขึ้นต้นด้วย 0"
+               class="field w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball">
+        <p id="phone-err" class="err mt-1.5 text-sm text-red-600">กรุณากรอกเบอร์โทร 10 หลัก ขึ้นต้นด้วย 0 (เช่น 0812345678)</p>
+      </div>
+
+      <div>
+        <label for="note" class="mb-1.5 block text-sm font-medium">หมายเหตุ <span class="text-slate-400">(ไม่บังคับ)</span></label>
+        <textarea id="note" name="note" rows="3" maxlength="200" placeholder="เช่น ขอยืมไม้แร็กเกต 2 อัน"
+                  class="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus-visible:border-court focus-visible:ring-2 focus-visible:ring-ball"></textarea>
+      </div>
+    </form>
+  </section>
+
+  <!-- ══════════ ขั้นที่ 3: ยืนยันการจอง ══════════ -->
+  <section id="step-3" data-step="3" hidden>
+    <h2 class="mb-1 text-lg font-bold">ตรวจสอบและยืนยัน</h2>
+    <p class="mb-5 text-sm text-slate-500">โปรดตรวจสอบรายละเอียดก่อนกดยืนยัน</p>
+
+    <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+      <dl id="summary" class="divide-y divide-slate-100"></dl>
+      <div class="flex items-end justify-between gap-4 bg-court px-5 py-4 text-white">
+        <div>
+          <p class="text-sm text-white/70">รวมทั้งสิ้น</p>
+          <p id="price-detail" class="text-sm text-white/70"></p>
+        </div>
+        <p id="price-total" class="text-3xl font-bold text-ball"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- แถบสรุป + ปุ่มนำทาง (ติดล่างจอ) -->
+<div class="fixed inset-x-0 bottom-0 border-t border-black/5 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+    <p id="bar-info" class="min-w-0 flex-1 text-sm text-slate-600"></p>
+    <button id="btn-back" type="button"
+            class="rounded-xl px-4 py-3 font-medium text-slate-600 transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-court">
+      ย้อนกลับ
+    </button>
+    <button id="btn-next" type="button"
+            class="rounded-xl bg-ball px-6 py-3 font-bold text-court shadow-sm transition hover:bg-ball-dark focus-visible:ring-2 focus-visible:ring-court focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none">
+      ถัดไป
+    </button>
+  </div>
+</div>
+
+<!-- ป๊อปอัพยืนยันสำเร็จ -->
+<dialog id="done" closedby="any"
+        class="m-auto w-[min(24rem,90vw)] rounded-2xl p-0 backdrop:bg-black/50">
+  <div class="p-7 text-center">
+    <div class="mx-auto grid size-16 place-items-center rounded-full bg-ball text-3xl">✓</div>
+    <h2 class="mt-4 text-xl font-bold">จองสำเร็จแล้ว!</h2>
+    <p class="mt-1 text-sm text-slate-500">เจ้าหน้าที่จะโทรยืนยันก่อนถึงเวลาจอง</p>
+    <p class="mt-4 text-sm text-slate-500">เลขที่การจอง</p>
+    <p id="ref" class="text-2xl font-bold tracking-wider text-court"></p>
+    <p id="done-detail" class="mt-3 text-sm text-slate-600"></p>
+    <button id="btn-again" type="button" autofocus
+            class="mt-6 w-full rounded-xl bg-court px-4 py-3 font-bold text-white transition hover:bg-court-light focus-visible:ring-2 focus-visible:ring-ball">
+      จองอีกครั้ง
+    </button>
+  </div>
+</dialog>
+
+<script>
+// ─────────────── Mock Data ───────────────
+const COURTS = [
+  { id: 'A', name: 'คอร์ท A', surface: 'ฮาร์ดคอร์ท · กลางแจ้ง', price: 250 },
+  { id: 'B', name: 'คอร์ท B', surface: 'ฮาร์ดคอร์ท · กลางแจ้ง', price: 250 },
+  { id: 'C', name: 'คอร์ท C', surface: 'อะคริลิก · มีหลังคา',   price: 350 },
+]
+const HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+const STEP_LABELS = ['เลือกวัน-เวลา', 'ข้อมูลผู้จอง', 'ยืนยันการจอง']
+
+// key วันที่แบบ local (ห้ามใช้ toISOString — ไทย UTC+7 จะเพี้ยนไป 1 วันช่วงเช้ามืด)
+const dateKey = (d) => new Intl.DateTimeFormat('en-CA').format(d)
+const fmtWeekday = new Intl.DateTimeFormat('th-TH', { weekday: 'short' })
+const fmtDayMonth = new Intl.DateTimeFormat('th-TH', { day: 'numeric', month: 'short' })
+const fmtFull = new Intl.DateTimeFormat('th-TH', { dateStyle: 'full' })
+
+const DAYS = Array.from({ length: 7 }, (_, i) => {
+  const d = new Date()
+  d.setDate(d.getDate() + i)
+  return { key: dateKey(d), weekday: fmtWeekday.format(d), dayMonth: fmtDayMonth.format(d), full: fmtFull.format(d), isToday: i === 0 }
+})
+
+// ช่องที่ถูกจองไว้แล้ว — อ้างอิงจาก DAYS ที่ generate มา ไม่ hardcode วันที่
+let booked = {
+  [`${DAYS[0].key}|A`]: [10, 11, 18],
+  [`${DAYS[0].key}|C`]: [17, 18, 19],
+  [`${DAYS[1].key}|B`]: [9, 10, 20],
+  [`${DAYS[2].key}|C`]: [12, 13, 14],
+}
+
+// ─────────────── State (immutable) ───────────────
+let state = { step: 1, date: DAYS[0].key, court: null, hours: [] }
+const setState = (patch) => { state = { ...state, ...patch }; render() }
+
+// ─────────────── Helpers ───────────────
+const hhmm = (h) => `${String(h).padStart(2, '0')}:00`
+const baht = (n) => `฿${n.toLocaleString('th-TH')}`
+const courtOf = (id) => COURTS.find((c) => c.id === id)
+const bookedHours = (date, court) => booked[`${date}|${court}`] ?? []
+const totalPrice = (courtId, hours) => (courtOf(courtId)?.price ?? 0) * hours.length
+
+/** รวมชั่วโมงที่ติดกันเป็นช่วงเดียว: [10,11,12] → "10:00 – 13:00" */
+const formatRanges = (hours) => {
+  const sorted = [...hours].sort((a, b) => a - b)
+  const ranges = sorted.reduce((acc, h) => {
+    const last = acc.at(-1)
+    return last && h === last.end ? [...acc.slice(0, -1), { ...last, end: h + 1 }] : [...acc, { start: h, end: h + 1 }]
+  }, [])
+  return ranges.map((r) => `${hhmm(r.start)} – ${hhmm(r.end)}`).join(', ')
+}
+
+/** หนีอักขระ HTML ก่อนยัดค่าที่ผู้ใช้กรอกลง innerHTML */
+const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+
+const el = (tag, className, html) => {
+  const node = document.createElement(tag)
+  node.className = className
+  if (html !== undefined) node.innerHTML = html
+  return node
+}
+
+// ─────────────── สร้าง UI ครั้งเดียว (render แค่อัปเดตสถานะ) ───────────────
+const stepperEl = document.getElementById('stepper')
+const daysEl = document.getElementById('days')
+const courtsEl = document.getElementById('courts')
+const slotsEl = document.getElementById('slots')
+const slotHintEl = document.getElementById('slot-hint')
+const barInfoEl = document.getElementById('bar-info')
+const btnBack = document.getElementById('btn-back')
+const btnNext = document.getElementById('btn-next')
+const form = document.getElementById('booker-form')
+const doneDialog = document.getElementById('done')
+
+STEP_LABELS.forEach((label, i) => {
+  const li = el('li', 'flex flex-1 items-center gap-2')
+  li.innerHTML = `
+    <span data-circle class="grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition">${i + 1}</span>
+    <span data-label class="truncate transition">${label}</span>
+    ${i < STEP_LABELS.length - 1 ? '<span class="hidden h-px flex-1 bg-slate-300 sm:block"></span>' : ''}`
+  stepperEl.append(li)
+})
+
+DAYS.forEach((day) => {
+  const btn = el('button', 'shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-court')
+  btn.type = 'button'
+  btn.dataset.date = day.key
+  btn.innerHTML = `
+    <span class="block text-xs opacity-70">${day.isToday ? 'วันนี้' : day.weekday}</span>
+    <span class="block font-bold whitespace-nowrap">${day.dayMonth}</span>`
+  btn.addEventListener('click', () => setState({ date: day.key, hours: [] }))
+  daysEl.append(btn)
+})
+
+COURTS.forEach((court) => {
+  const btn = el('button', 'rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-court')
+  btn.type = 'button'
+  btn.dataset.court = court.id
+  btn.innerHTML = `
+    <span class="block font-bold">${court.name}</span>
+    <span class="block text-sm text-slate-500">${court.surface}</span>
+    <span data-price class="mt-2 block font-bold">${baht(court.price)}<span class="text-sm font-normal text-slate-500"> / ชม.</span></span>`
+  btn.addEventListener('click', () => setState({ court: court.id, hours: [] }))
+  courtsEl.append(btn)
+})
+
+HOURS.forEach((hour) => {
+  const btn = el('button', 'rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-court')
+  btn.type = 'button'
+  btn.dataset.hour = hour
+  btn.addEventListener('click', () => {
+    const hours = state.hours.includes(hour) ? state.hours.filter((h) => h !== hour) : [...state.hours, hour]
+    setState({ hours })
+  })
+  slotsEl.append(btn)
+})
+
+// ─────────────── Render ───────────────
+function render() {
+  // แถบขั้นตอน
+  stepperEl.querySelectorAll('li').forEach((li, i) => {
+    const step = i + 1
+    const active = step === state.step
+    const past = step < state.step
+    li.setAttribute('aria-current', active ? 'step' : 'false')
+    li.querySelector('[data-circle]').className =
+      `grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition ${
+        active ? 'bg-court text-white' : past ? 'bg-ball text-court' : 'bg-slate-200 text-slate-500'}`
+    li.querySelector('[data-label]').className =
+      `truncate transition ${active ? 'font-bold text-court' : 'text-slate-400'}`
+  })
+
+  // สลับหน้าจอ
+  document.querySelectorAll('[data-step]').forEach((section) => {
+    section.hidden = Number(section.dataset.step) !== state.step
+  })
+
+  // ปุ่มวันที่
+  daysEl.querySelectorAll('button').forEach((btn) => {
+    const on = btn.dataset.date === state.date
+    btn.setAttribute('aria-pressed', String(on))
+    btn.className = `shrink-0 rounded-xl border px-4 py-3 text-center transition focus-visible:ring-2 focus-visible:ring-court ${
+      on ? 'border-court bg-court text-white' : 'border-slate-200 bg-white hover:border-court'}`
+  })
+
+  // การ์ดคอร์ท
+  courtsEl.querySelectorAll('button').forEach((btn) => {
+    const on = btn.dataset.court === state.court
+    btn.setAttribute('aria-pressed', String(on))
+    btn.className = `rounded-2xl border p-4 text-left transition focus-visible:ring-2 focus-visible:ring-court ${
+      on ? 'border-court bg-court/5 ring-2 ring-court' : 'border-slate-200 bg-white hover:border-court'}`
+    btn.querySelector('[data-price]').classList.toggle('text-court', on)
+  })
+
+  // ช่วงเวลา
+  const ready = Boolean(state.date && state.court)
+  slotHintEl.hidden = ready
+  slotsEl.hidden = !ready
+  const taken = ready ? bookedHours(state.date, state.court) : []
+  slotsEl.querySelectorAll('button').forEach((btn) => {
+    const hour = Number(btn.dataset.hour)
+    const isTaken = taken.includes(hour)
+    const on = state.hours.includes(hour)
+    btn.disabled = isTaken
+    btn.setAttribute('aria-pressed', String(on))
+    btn.innerHTML = isTaken
+      ? `<span class="line-through">${hhmm(hour)}</span><span class="block text-xs">เต็ม</span>`
+      : hhmm(hour)
+    btn.className = `rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-court ${
+      isTaken ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+      : on ? 'border-ball-dark bg-ball font-bold text-court'
+      : 'border-slate-200 bg-white hover:border-court'}`
+  })
+
+  if (state.step === 3) renderSummary()
+  renderBar()
+}
+
+function renderSummary() {
+  const day = DAYS.find((d) => d.key === state.date)
+  const court = courtOf(state.court)
+  const rows = [
+    ['วันที่', day.full],
+    ['คอร์ท', `${court.name} (${court.surface})`],
+    ['ช่วงเวลา', formatRanges(state.hours)],
+    ['รวม', `${state.hours.length} ชั่วโมง`],
+    // form.name คือชื่อของ <form> เอง ไม่ใช่ input — ต้องอ่านผ่าน form.elements
+    ['ผู้จอง', form.elements.name.value.trim()],
+    ['เบอร์โทร', form.elements.phone.value.trim()],
+    ...(form.elements.note.value.trim() ? [['หมายเหตุ', form.elements.note.value.trim()]] : []),
+  ]
+  document.getElementById('summary').innerHTML = rows.map(([label, value]) => `
+    <div class="flex gap-4 px-5 py-3">
+      <dt class="w-24 shrink-0 text-sm text-slate-500">${label}</dt>
+      <dd class="flex-1 font-medium">${esc(value)}</dd>
+    </div>`).join('')
+
+  document.getElementById('price-detail').textContent =
+    `${baht(court.price)} × ${state.hours.length} ชม.`
+  document.getElementById('price-total').textContent = baht(totalPrice(state.court, state.hours))
+}
+
+function renderBar() {
+  const canProceed = Boolean(state.date && state.court && state.hours.length)
+  btnBack.hidden = state.step === 1
+  btnNext.textContent = state.step === 3 ? 'ยืนยันการจอง' : 'ถัดไป'
+  btnNext.disabled = state.step === 1 && !canProceed
+
+  barInfoEl.textContent =
+    state.step !== 1 ? ''
+    : canProceed ? `เลือกแล้ว ${state.hours.length} ชม. · ${baht(totalPrice(state.court, state.hours))}`
+    : 'เลือกวัน คอร์ท และช่วงเวลา'
+}
+
+// ─────────────── นำทางระหว่างขั้น ───────────────
+btnBack.addEventListener('click', () => setState({ step: state.step - 1 }))
+
+btnNext.addEventListener('click', () => {
+  if (state.step === 1) return setState({ step: 2 })
+
+  if (state.step === 2) {
+    // ตรวจข้อมูลก่อนไปต่อเสมอ — ไม่ปล่อยค่าว่าง/รูปแบบผิดผ่าน
+    if (!form.checkValidity()) {
+      form.querySelectorAll('.field').forEach(syncAria)
+      return form.reportValidity()
+    }
+    return setState({ step: 3 })
+  }
+
+  confirmBooking()
+})
+
+// sync aria-invalid ให้ตรงกับสถานะที่ตาเห็น (:user-invalid ไม่ทำให้เอง)
+const syncAria = (input) => input.setAttribute('aria-invalid', String(input.matches(':user-invalid')))
+form.addEventListener('blur', (e) => { if (e.target.matches('.field')) syncAria(e.target) }, true)
+form.addEventListener('input', (e) => { if (e.target.hasAttribute('aria-invalid')) syncAria(e.target) })
+form.addEventListener('submit', (e) => { e.preventDefault(); btnNext.click() })
+
+function confirmBooking() {
+  const key = `${state.date}|${state.court}`
+  booked = { ...booked, [key]: [...bookedHours(state.date, state.court), ...state.hours] }
+
+  const day = DAYS.find((d) => d.key === state.date)
+  document.getElementById('ref').textContent = `TN-${String(Math.floor(Math.random() * 9000) + 1000)}`
+  document.getElementById('done-detail').textContent =
+    `${courtOf(state.court).name} · ${day.dayMonth} · ${formatRanges(state.hours)}`
+  doneDialog.showModal()
+}
+
+document.getElementById('btn-again').addEventListener('click', () => doneDialog.close())
+
+// ผูกกับ close เพื่อให้ปิดด้วยปุ่ม / Esc / คลิกนอกกล่อง ได้ผลเหมือนกันหมด
+// (ถ้าผูกไว้แค่ปุ่ม การกด Esc จะค้างอยู่ขั้น 3 แล้วกดยืนยันซ้ำได้)
+doneDialog.addEventListener('close', () => {
+  form.reset()
+  form.querySelectorAll('.field').forEach((input) => input.removeAttribute('aria-invalid'))
+  setState({ step: 1, date: DAYS[0].key, court: null, hours: [] })
+})
+
+render()
+
+// ─────────────── Self-check (เปิดด้วย ?selftest=1) ───────────────
+function selfTest() {
+  console.assert(formatRanges([10, 11, 12]) === '10:00 – 13:00', 'ชั่วโมงติดกันต้องรวมเป็นช่วงเดียว')
+  console.assert(formatRanges([10, 14]) === '10:00 – 11:00, 14:00 – 15:00', 'ชั่วโมงไม่ติดกันต้องแยกช่วง')
+  console.assert(formatRanges([12, 10, 11]) === '10:00 – 13:00', 'ต้องเรียงลำดับก่อนรวมช่วง')
+  console.assert(totalPrice('C', [10, 11]) === 700, 'ราคารวม = ราคาคอร์ท × จำนวนชั่วโมง')
+  console.assert(totalPrice('A', []) === 0, 'ยังไม่เลือกเวลา ราคาต้องเป็น 0')
+  console.assert(DAYS[0].key === dateKey(new Date()), 'วันแรกต้องเป็นวันนี้ตามเวลาท้องถิ่น')
+
+  const takenHour = booked[`${DAYS[0].key}|A`][0]
+  setState({ date: DAYS[0].key, court: 'A' })
+  const slot = slotsEl.querySelector(`[data-hour="${takenHour}"]`)
+  console.assert(slot.disabled, 'ช่องที่ถูกจองแล้วต้องกดไม่ได้')
+  console.assert(!slotsEl.querySelector('[data-hour="15"]').disabled, 'ช่องว่างต้องกดได้')
+  console.info('selftest: เสร็จแล้ว — ถ้าไม่มี assertion ล้มเหลวด้านบน แปลว่าผ่าน')
+}
+if (new URLSearchParams(location.search).get('selftest') === '1') selfTest()
+</script>
+</body>
+</html>
