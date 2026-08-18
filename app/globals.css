@@ -1,16 +1,23 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-ball: #d8f34a;
-  --color-ball-dark: #b9d92c;
-  --color-court: #14503d;
-  --color-court-light: #1f7a5c;
-  --color-clay: #f4f7ee;
-  /* โทนดำเข้ม: พื้นหลัง → การ์ด → ชั้นยก → เส้นขอบ */
-  --color-ink: #0a0d0c;
-  --color-panel: #141917;
-  --color-panel-2: #1e2422;
-  --color-line: #2c3431;
+  --color-ball: #e3ff3a;        /* เหลืองออปติก — ปุ่มยืนยัน, ราคา, ช่องที่เลือก */
+  --color-ball-dark: #c2e224;   /* เหลืองออปติกหม่นลง — hover ปุ่มยืนยัน */
+  --color-court: #1a4a8f;       /* น้ำเงินฮาร์ดคอร์ตใต้ไฟสนาม — header, แถบราคารวม, ปุ่มใน dialog */
+  --color-court-light: #2a68c8; /* น้ำเงินคอร์ตสว่างขึ้น — court hover */
+  --color-clay: #1f6b48;        /* เขียวขอบสนาม — ยังไม่ถูกใช้ */
+  /* โทนกรมท่ากลางดึก: พื้นหลัง → การ์ด → ชั้นยก → เส้นขอบ */
+  --color-ink: #050a1c;
+  --color-panel: #101c45;
+  --color-panel-2: #1d2d64;
+  --color-line: #31427f;
+  /* ข้อความ: หลัก → รอง → จางสุด */
+  --color-fg: #f2f6ff;
+  --color-mute: #9aacdd;
+  --color-mute-2: #8a9bce;
+  /* error */
+  --color-danger: #ff7a85;
+  --color-danger-bg: #3b1220;
 }
 
 /* ต้องเป็น inline เพราะค่าอ้าง CSS variable ที่ next/font ใส่ให้ตอน runtime บน <html> */
@@ -21,13 +28,13 @@
 /* ลายเส้นคอร์ทจาง ๆ บน header — ทำด้วย gradient ไม่ใช้รูป */
 .court-lines {
   background-image:
-    linear-gradient(to right, rgba(255,255,255,.14) 2px, transparent 2px),
-    linear-gradient(to bottom, rgba(255,255,255,.10) 2px, transparent 2px);
+    linear-gradient(to right, rgba(255,255,255,.20) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(255,255,255,.14) 2px, transparent 2px);
   background-size: 120px 100%, 100% 64px;
 }
 
 /* แสดง error หลังผู้ใช้โต้ตอบเสร็จแล้วเท่านั้น (ไม่ขึ้นตอนกำลังพิมพ์ครั้งแรก) */
-.field:user-invalid { border-color: #f87171; background-color: #2b1618; }
+.field:user-invalid { border-color: var(--color-danger); background-color: var(--color-danger-bg); }
 .field:user-invalid ~ .err { display: block; }
 .err { display: none; }
 

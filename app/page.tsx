@@ -251,7 +251,7 @@ export default function Page() {
     : []
 
   const fieldClass =
-    'field w-full rounded-xl border border-line bg-panel-2 px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball'
+    'field w-full rounded-xl border border-line bg-panel-2 px-4 py-3 text-fg placeholder:text-mute-2 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball'
 
   return (
     <>
@@ -278,12 +278,12 @@ export default function Page() {
               <li key={label} aria-current={active ? 'step' : 'false'} className="flex flex-1 items-center gap-2">
                 <span
                   className={`grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold transition ${
-                    active ? 'bg-ball text-court' : past ? 'bg-court-light text-white' : 'bg-panel-2 text-slate-500'
+                    active ? 'bg-ball text-court' : past ? 'bg-court-light text-white' : 'bg-panel-2 text-mute-2'
                   }`}
                 >
                   {step}
                 </span>
-                <span className={`truncate transition ${active ? 'font-bold text-ball' : 'text-slate-500'}`}>{label}</span>
+                <span className={`truncate transition ${active ? 'font-bold text-ball' : 'text-mute-2'}`}>{label}</span>
                 {i < STEP_LABELS.length - 1 && <span className="hidden h-px flex-1 bg-line sm:block" />}
               </li>
             )
@@ -334,10 +334,10 @@ export default function Page() {
                   }`}
                 >
                   <span className="block font-bold">{c.name}</span>
-                  <span className="block text-sm text-slate-400">{c.surface}</span>
+                  <span className="block text-sm text-mute">{c.surface}</span>
                   <span className={`mt-2 block font-bold ${on ? 'text-ball' : ''}`}>
                     {baht(c.price)}
-                    <span className="text-sm font-normal text-slate-400"> / ชม.</span>
+                    <span className="text-sm font-normal text-mute"> / ชม.</span>
                   </span>
                 </button>
               )
@@ -345,20 +345,20 @@ export default function Page() {
           </div>
 
           <h2 className="mt-7 mb-1 text-lg font-bold">3. เลือกช่วงเวลา</h2>
-          <p className="mb-3 text-sm text-slate-400">เลือกได้หลายช่อง ช่องละ 1 ชั่วโมง</p>
+          <p className="mb-3 text-sm text-mute">เลือกได้หลายช่อง ช่องละ 1 ชั่วโมง</p>
           <div
             hidden={ready && !loading && !loadError}
-            className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-slate-400"
+            className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-mute"
           >
             {!ready ? (
               'เลือกวันที่และคอร์ทก่อน เพื่อดูช่วงเวลาที่ว่าง'
             ) : loadError ? (
               <>
-                <p className="text-red-400">โหลดช่วงเวลาที่ว่างไม่สำเร็จ</p>
+                <p className="text-danger">โหลดช่วงเวลาที่ว่างไม่สำเร็จ</p>
                 <button
                   type="button"
                   onClick={() => loadOccupancy(days)}
-                  className="mt-3 rounded-xl border border-line bg-panel-2 px-4 py-2 font-medium text-slate-100 transition hover:border-ball/60 focus-visible:ring-2 focus-visible:ring-ball"
+                  className="mt-3 rounded-xl border border-line bg-panel-2 px-4 py-2 font-medium text-fg transition hover:border-ball/60 focus-visible:ring-2 focus-visible:ring-ball"
                 >
                   ลองใหม่
                 </button>
@@ -386,9 +386,9 @@ export default function Page() {
                   }
                   className={`rounded-xl border py-3 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-ball ${
                     isTaken
-                      ? 'cursor-not-allowed border-line/60 bg-panel-2 text-slate-600'
+                      ? 'cursor-not-allowed border-line/60 bg-panel-2 text-mute-2'
                       : past
-                        ? 'cursor-not-allowed border-dashed border-line/60 bg-panel text-slate-600'
+                        ? 'cursor-not-allowed border-dashed border-line/60 bg-panel text-mute-2'
                         : on
                           ? 'border-ball-dark bg-ball font-bold text-court'
                           : 'border-line bg-panel hover:border-ball/60'
@@ -411,7 +411,7 @@ export default function Page() {
         {/* ══════════ ขั้นที่ 2: ข้อมูลผู้จอง ══════════ */}
         <section hidden={state.step !== 2}>
           <h2 className="mb-1 text-lg font-bold">ข้อมูลผู้จอง</h2>
-          <p className="mb-5 text-sm text-slate-400">กรอกให้ครบเพื่อยืนยันคิว เราจะติดต่อกลับหากมีการเปลี่ยนแปลง</p>
+          <p className="mb-5 text-sm text-mute">กรอกให้ครบเพื่อยืนยันคิว เราจะติดต่อกลับหากมีการเปลี่ยนแปลง</p>
 
           <form
             ref={formRef}
@@ -432,7 +432,7 @@ export default function Page() {
           >
             <div>
               <label htmlFor="name" className="mb-1.5 block text-sm font-medium">
-                ชื่อ-นามสกุล <span className="text-red-400">*</span>
+                ชื่อ-นามสกุล <span className="text-danger">*</span>
               </label>
               <input
                 id="name"
@@ -446,14 +446,14 @@ export default function Page() {
                 placeholder="เช่น สมชาย ใจดี"
                 className={fieldClass}
               />
-              <p id="name-err" className="err mt-1.5 text-sm text-red-400">
+              <p id="name-err" className="err mt-1.5 text-sm text-danger">
                 กรุณากรอกชื่อ-นามสกุล อย่างน้อย 2 ตัวอักษร
               </p>
             </div>
 
             <div>
               <label htmlFor="phone" className="mb-1.5 block text-sm font-medium">
-                เบอร์โทรศัพท์ <span className="text-red-400">*</span>
+                เบอร์โทรศัพท์ <span className="text-danger">*</span>
               </label>
               <input
                 id="phone"
@@ -470,14 +470,14 @@ export default function Page() {
                 title="เบอร์โทรศัพท์ 10 หลัก ขึ้นต้นด้วย 0"
                 className={fieldClass}
               />
-              <p id="phone-err" className="err mt-1.5 text-sm text-red-400">
+              <p id="phone-err" className="err mt-1.5 text-sm text-danger">
                 กรุณากรอกเบอร์โทร 10 หลัก ขึ้นต้นด้วย 0 (เช่น 0812345678)
               </p>
             </div>
 
             <div>
               <label htmlFor="note" className="mb-1.5 block text-sm font-medium">
-                หมายเหตุ <span className="text-slate-500">(ไม่บังคับ)</span>
+                หมายเหตุ <span className="text-mute-2">(ไม่บังคับ)</span>
               </label>
               <textarea
                 id="note"
@@ -485,7 +485,7 @@ export default function Page() {
                 rows={3}
                 maxLength={200}
                 placeholder="เช่น ขอยืมไม้แร็กเกต 2 อัน"
-                className="w-full resize-none rounded-xl border border-line bg-panel-2 px-4 py-3 text-slate-100 placeholder:text-slate-500 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball"
+                className="w-full resize-none rounded-xl border border-line bg-panel-2 px-4 py-3 text-fg placeholder:text-mute-2 outline-none transition focus-visible:border-ball focus-visible:ring-2 focus-visible:ring-ball"
               />
             </div>
           </form>
@@ -494,19 +494,19 @@ export default function Page() {
         {/* ══════════ ขั้นที่ 3: ยืนยันการจอง ══════════ */}
         <section hidden={state.step !== 3}>
           <h2 className="mb-1 text-lg font-bold">ตรวจสอบและยืนยัน</h2>
-          <p className="mb-5 text-sm text-slate-400">โปรดตรวจสอบรายละเอียดก่อนกดยืนยัน</p>
+          <p className="mb-5 text-sm text-mute">โปรดตรวจสอบรายละเอียดก่อนกดยืนยัน</p>
 
           <div className="overflow-hidden rounded-2xl bg-panel shadow-sm ring-1 ring-white/10">
             <dl className="divide-y divide-white/10">
               {summaryRows.map(([label, value]) => (
                 <div key={label} className="flex gap-4 px-5 py-3">
-                  <dt className="w-24 shrink-0 text-sm text-slate-400">{label}</dt>
+                  <dt className="w-24 shrink-0 text-sm text-mute">{label}</dt>
                   <dd className="flex-1 font-medium">{value}</dd>
                 </div>
               ))}
             </dl>
             {formError && (
-              <p role="alert" className="border-t border-white/10 bg-panel-2 px-5 py-3 text-sm text-red-400">
+              <p role="alert" className="border-t border-white/10 bg-panel-2 px-5 py-3 text-sm text-danger">
                 {formError}
               </p>
             )}
@@ -517,7 +517,7 @@ export default function Page() {
                   {court ? `${baht(court.price)} × ${state.hours.length} ชม.` : ''}
                 </p>
               </div>
-              <p className="text-3xl font-bold text-ball">{baht(totalPrice(state.court, state.hours))}</p>
+              <p className="text-3xl font-extrabold tracking-tight text-ball">{baht(totalPrice(state.court, state.hours))}</p>
             </div>
           </div>
         </section>
@@ -526,7 +526,7 @@ export default function Page() {
       {/* แถบสรุป + ปุ่มนำทาง (ติดล่างจอ) */}
       <div className="fixed inset-x-0 bottom-0 border-t border-white/10 bg-ink/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <p className="min-w-0 flex-1 text-sm text-slate-400">
+          <p className="min-w-0 flex-1 text-sm text-mute">
             {state.step !== 1
               ? ''
               : canProceed
@@ -537,7 +537,7 @@ export default function Page() {
             type="button"
             hidden={state.step === 1}
             onClick={() => setState((s) => ({ ...s, step: s.step - 1 }))}
-            className="rounded-xl px-4 py-3 font-medium text-slate-300 transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-ball"
+            className="rounded-xl px-4 py-3 font-medium text-mute transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-ball"
           >
             ย้อนกลับ
           </button>
@@ -545,7 +545,7 @@ export default function Page() {
             type="button"
             disabled={(state.step === 1 && !canProceed) || submitting}
             onClick={goNext}
-            className="rounded-xl bg-ball px-6 py-3 font-bold text-court shadow-sm transition hover:bg-ball-dark focus-visible:ring-2 focus-visible:ring-ball focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:bg-panel-2 disabled:text-slate-500 disabled:shadow-none"
+            className="rounded-xl bg-ball px-6 py-3 font-bold text-court shadow-sm transition hover:bg-ball-dark focus-visible:ring-2 focus-visible:ring-ball focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:bg-panel-2 disabled:text-mute-2 disabled:shadow-none"
           >
             {submitting ? 'กำลังจอง…' : state.step === 3 ? 'ยืนยันการจอง' : 'ถัดไป'}
           </button>
@@ -557,15 +557,15 @@ export default function Page() {
         ref={dialogRef}
         closedby="any"
         onClose={handleDialogClose}
-        className="m-auto w-[min(24rem,90vw)] rounded-2xl bg-panel p-0 text-slate-100 ring-1 ring-white/10 backdrop:bg-black/70"
+        className="m-auto w-[min(24rem,90vw)] rounded-2xl bg-panel p-0 text-fg ring-1 ring-white/10 backdrop:bg-ink/85"
       >
         <div className="p-7 text-center">
           <div className="mx-auto grid size-16 place-items-center rounded-full bg-ball text-3xl">✓</div>
           <h2 className="mt-4 text-xl font-bold">จองสำเร็จแล้ว!</h2>
-          <p className="mt-1 text-sm text-slate-400">เจ้าหน้าที่จะโทรยืนยันก่อนถึงเวลาจอง</p>
-          <p className="mt-4 text-sm text-slate-400">เลขที่การจอง</p>
+          <p className="mt-1 text-sm text-mute">เจ้าหน้าที่จะโทรยืนยันก่อนถึงเวลาจอง</p>
+          <p className="mt-4 text-sm text-mute">เลขที่การจอง</p>
           <p className="text-2xl font-bold tracking-wider text-ball">{done?.ref}</p>
-          <p className="mt-3 text-sm text-slate-400">{done?.detail}</p>
+          <p className="mt-3 text-sm text-mute">{done?.detail}</p>
           <button
             type="button"
             autoFocus

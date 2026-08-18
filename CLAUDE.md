@@ -126,8 +126,14 @@ One `'use client'` component, four ordered blocks: mock data → helpers → sta
 
 Tailwind v4 via PostCSS. [app/globals.css](app/globals.css) holds `@import 'tailwindcss'`, the `@theme`
 block with the accents `--color-ball` / `--color-ball-dark` / `--color-court` / `--color-court-light` /
-`--color-clay` and the dark surfaces `--color-ink` / `--color-panel` / `--color-panel-2` / `--color-line`,
-plus `.court-lines`, the `:user-invalid` error rules, and the reduced-motion killswitch. The UI is dark-only.
+`--color-clay`, the surfaces `--color-ink` / `--color-panel` / `--color-panel-2` / `--color-line`, the text
+ramp `--color-fg` / `--color-mute` / `--color-mute-2`, and `--color-danger` / `--color-danger-bg`,
+plus `.court-lines`, the `:user-invalid` error rules, and the reduced-motion killswitch.
+
+**Every color in the markup routes through those 14 tokens** — there are no `slate-*` / `red-*` utilities
+left in `app/page.tsx`. Swapping the whole look is one `@theme` block replacement. The only exceptions are
+the `text-white` / `white/10` / `white/5` / `black/70` alpha overlays on `bg-court` and the dialog backdrop:
+those assume dark surfaces, so a **light** theme has to flip them to `black/…` by hand. The UI is dark-only today.
 
 `--font-sans` lives in a separate **`@theme inline`** block because it references the CSS variable
 `next/font` sets on `<html>` at runtime — a plain `@theme` would inline `var(...)` wrongly at build time.
